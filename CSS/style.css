@@ -1,0 +1,1523 @@
+/* ==========================================================================
+   1. RESET E CONFIGURAÇÕES GLOBAIS (BASE)
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   2. ESTRUTURA PRINCIPAL (LAYOUT)
+   ========================================================================== */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ==========================================================================
+   3. CABEÇALHO (HEADER) E LOGOTIPO
+   ========================================================================== */
+header {
+    flex-shrink: 0;
+    background: #0114dc;
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.logo-container {
+    background: #e8e8e8;
+    padding: 5px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logo-container img {
+    height: 35px;
+    width: auto;
+}
+
+/* ==========================================================================
+   4. MENU DO USUÁRIO E DROPDOWN
+   ========================================================================== */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.user-info:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.user-name {
+    color: white;
+    margin-right: 10px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.user-info .fa-user-circle {
+    font-size: 28px;
+    color: white;
+}
+
+.dropdown-content {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1001;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 5px;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.user-menu:hover .dropdown-content {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0.2s;
+}
+
+h1 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 11px;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.dropdown-content a:hover { background-color: #f1f1f1; }
+
+/* ==========================================================================
+   5. SISTEMA DE ABAS (TABS) E CONTEÚDO
+   ========================================================================== */
+.tabs {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #fff;
+    border-bottom: 2px solid #0114dc;
+}
+
+/* Wrapper de conteúdo com scroll */
+.content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+    background: #f5f5f5;
+}
+
+.tab {
+    padding: 6px 12px;
+    background: #e8eef7;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    border-bottom: none;
+}
+
+.tab:hover {
+    background: #c8d8f0;
+    color: #0114dc;
+    transform: translateY(-2px);
+}
+
+.tab.active {
+    background: #0114dc;
+    color: white;
+    border-color: #0114dc;
+    box-shadow: 0 4px 8px rgba(1, 20, 220, 0.3);
+}
+
+.tab.active:hover {
+    background: #0a1f5c;
+    transform: translateY(0);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   6. CARDS GERAIS E GRID DE ESTATÍSTICAS
+   ========================================================================== */
+.card {
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 12px;
+}
+
+.card h2 {
+    font-size: 1.2em;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #0114dc 0%, #000aab 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(1, 20, 220, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.stat-card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.stat-card .value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   7. FORMULÁRIOS (INPUTS, LABELS, BOTÕES)
+   ========================================================================== */
+.form-group {
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 600;
+    color: #333;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 4px 6px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 10px;
+    transition: border-color 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #0114dc;
+}
+
+button {
+    background: #0114dc;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.1s ease;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    position: relative;
+    font-weight: 600;
+    top: 0;
+}
+
+button:hover {
+    background: #010fa8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+button.secondary {
+    background: #6c757d;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+button.secondary:hover {
+    background: #5a6268;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+button.danger {
+    background: #dc3545;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+button.danger:hover {
+    background: #c82333;
+}
+
+/* ==========================================================================
+   8. TABELAS DE DADOS
+   ========================================================================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 11px;
+}
+
+th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+tr:hover {
+    background: #f8f9fa;
+}
+
+/* ==========================================================================
+   9. ALERTAS E MENSAGENS
+   ========================================================================== */
+.alert {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+}
+
+.alert-success {
+    background: #d4edda;
+    border-left: 4px solid #28a745;
+    color: #155724;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+}
+
+/* ==========================================================================
+   10. GRÁFICO DE GANTT (VISUALIZAÇÃO)
+   ========================================================================== */
+.gantt-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 560px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.gantt-chart {
+    position: relative;
+}
+
+.gantt-header {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 2px solid #0114dc;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.gantt-name-col {
+    width: 180px;
+    min-width: 180px;
+    padding: 6px 8px;
+    font-weight: 600;
+    border-right: 2px solid #0114dc;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help;
+    /* Fixa a coluna de nomes ao scrollar horizontalmente */
+    position: sticky;
+    left: 0;
+    background: #f8f9fa;
+    z-index: 5;
+}
+
+.gantt-row .gantt-name-col {
+    background: #fff;
+    border-right: 2px solid #ddd;
+}
+
+.gantt-row:hover .gantt-name-col {
+    background: #f0f4ff;
+}
+
+.gantt-name-col:hover::after {
+    content: attr(data-fullname);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    margin-left: 8px;
+}
+
+.gantt-timeline {
+    display: flex;
+}
+
+.gantt-day {
+    width: 40px;
+    min-width: 40px;
+    padding: 4px 2px;
+    text-align: center;
+    border-right: 1px solid #ddd;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.gantt-day.weekend {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.gantt-row {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    min-height: 32px;
+    align-items: center;
+}
+
+.gantt-row:hover {
+    background: #f0f4ff;
+}
+
+.gantt-cells {
+    display: flex;
+    position: relative;
+    height: 32px;
+}
+
+.gantt-cell {
+    width: 40px;
+    min-width: 40px;
+    border-right: 1px solid #eee;
+    position: relative;
+    height: 100%;
+}
+
+.gantt-cell.weekend {
+    background: rgba(255, 243, 205, 0.4);
+}
+
+.gantt-bar {
+    position: absolute;
+    height: 22px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    top: 5px;
+}
+
+.gantt-bar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Cores dos estados no Gantt */
+.gantt-bar.embarque { background: #0114dc; }
+.gantt-bar.folga { background: #43e97b; }
+.gantt-bar.base { background: #e9700d; }
+.gantt-bar.dobra { background: #ff6b6b; }
+.gantt-bar.ferias { background: #ffc107; }
+
+/* ==========================================================================
+   11. LEGENDAS E CORES DE STATUS
+   ========================================================================== */
+/* Legenda cores */
+.legend-color.embarque { background: #0114dc; }
+.legend-color.folga { background: #43e97b; }
+.legend-color.base { background: #e9700d; }
+.legend-color.dobra { background: #ff6b6b; }
+.legend-color.ferias { background: #ffc107; }
+
+.legend {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   12. ESTILOS DE UNIDADES (LEGADO/TEMAS)
+   ========================================================================== */
+.unidade-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #0114dc;
+    text-align: center;
+    position: relative;
+}
+
+.unidade-card.padrao {
+    border-left-color: #28a745;
+    background: #d4edda;
+}
+
+.unidade-card h3 {
+    margin: 0 0 10px 0;
+    color: #0114dc;
+    font-size: 14px;
+}
+
+.unidade-card.padrao h3 {
+    color: #28a745;
+}
+
+.unidade-card .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.badge-padrao {
+    background: #28a745;
+    color: white;
+}
+
+.badge-custom {
+    background: #0114dc;
+    color: white;
+}
+
+.unidade-card button.delete-unidade {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   13. CARDS DE SONDAS E INFO DE PESSOAS
+   ========================================================================== */
+.sonda-card {
+    background: #f8f9fa;
+    border: 2px solid #0114dc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.sonda-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #0114dc;
+}
+
+.sonda-header h3 {
+    margin: 0;
+    color: #0114dc;
+    font-size: 16px;
+}
+
+.sonda-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.sonda-info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.sonda-info-item label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.sonda-info-item strong {
+    color: #1a1a1a;
+    font-size: 14px;
+}
+
+.pessoas-table {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.pessoas-table thead {
+    background: #0114dc;
+    color: white;
+}
+
+.pessoas-table th {
+    padding: 10px;
+    text-align: left;
+}
+
+.pessoas-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.pessoas-table tr:hover {
+    background: #f0f0f0;
+}
+
+.badge-dias {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-dias.alerta {
+    background: #ffc107;
+    color: #333;
+}
+
+.badge-dias.critico {
+    background: #dc3545;
+}
+
+.badge-dias.critico-roxo {
+    background: #9333ea;
+    color: white;
+    animation: pulse-roxo 2s infinite;
+}
+
+@keyframes pulse-roxo {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(147, 51, 234, 0);
+    }
+}
+
+.row-alerta-roxo {
+    background: #f3e8ff !important;
+    border-left: 4px solid #9333ea;
+}
+
+.row-alerta-roxo:hover {
+    background: #e9d5ff !important;
+}
+
+.row-alerta-roxo td {
+    font-weight: 500;
+}
+
+.empty-sondas {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.empty-sondas h3 {
+    color: #999;
+    margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   14. CARDS DE UNIDADES MARÍTIMAS (MODERNO/ATUAL)
+   ========================================================================== */
+.unidade-card {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid #0114dc;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-start;
+}
+
+.unidade-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(1, 20, 220, 0.2);
+}
+
+.unidade-card.status-manutencao {
+    border-left-color: #ffc107;
+    opacity: 0.9;
+}
+
+.unidade-card.status-inativo {
+    border-left-color: #dc3545;
+    opacity: 0.7;
+}
+
+.unidade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 10px;
+}
+
+.unidade-titulo {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.unidade-codigo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0114dc;
+    margin: 0 0 5px 0;
+}
+
+.unidade-nome {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+.unidade-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.unidade-status-badge.ativo {
+    background: #d4edda;
+    color: #155724;
+}
+
+.unidade-status-badge.manutencao {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.unidade-status-badge.inativo {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.unidade-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.unidade-info-item label {
+    display: block;
+    color: #999;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.unidade-info-item strong {
+    color: #333;
+    font-size: 13px;
+}
+
+.unidade-highlight {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.unidade-highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+    font-size: 12px;
+}
+
+.unidade-highlight-icon {
+    width: 20px;
+    text-align: center;
+}
+
+.unidade-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.unidade-actions button {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   15. ARRASTAR E SOLTAR (DRAG & DROP) - EQUIPES
+   ========================================================================== */
+.funcionario-card {
+    background: white;
+    border: 2px solid #0114dc;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: grab;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.funcionario-card:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(1, 20, 220, 0.3);
+}
+
+.funcionario-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.funcionario-card.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+.funcionario-card h4 {
+    margin: 0 0 5px 0;
+    color: #0114dc;
+    font-size: 13px;
+}
+
+.funcionario-card p {
+    margin: 3px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.funcionario-card .badge-gin {
+    display: inline-block;
+    background: #0114dc;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.funcionario-card .data-embarque-field {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.funcionario-card .data-embarque-field label {
+    display: inline-block;
+    font-size: 9px;
+    color: #666;
+    margin-bottom: 0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.funcionario-card .data-embarque-field input[type="date"] {
+    width: auto;
+    flex: 1;
+    padding: 2px 4px;
+    font-size: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    min-width: 0; /* Permite encolher em containers flex */
+}
+
+.funcionario-card .data-embarque-field input[type="date"]:focus {
+    border-color: #0114dc;
+    outline: none;
+}
+
+.funcionario-card .data-desembarque-info {
+    font-size: 10px;
+    color: #28a745;
+    margin-top: 2px;
+    font-weight: 500;
+    text-align: right;
+    width: 100%;
+}
+
+.drag-zone {
+    position: relative;
+}
+
+.drag-zone.drag-over {
+    background: #d4edda !important;
+    border-color: #28a745 !important;
+}
+
+.equipe-zone .funcionario-card {
+    border-color: #28a745;
+}
+
+.equipe-zone .funcionario-card h4 {
+    color: #28a745;
+}
+
+.equipe-zone .funcionario-card .badge-gin {
+    background: #28a745;
+}
+
+.equipe-zone .placeholder-text {
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   16. CARDS DE EQUIPES SALVAS
+   ========================================================================== */
+.equipe-card-salva {
+    background: #f8f9fa;
+    border: 2px solid #0114dc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.equipe-card-salva h3 {
+    margin: 0 0 10px 0;
+    color: #0114dc;
+}
+
+.equipe-card-salva .equipe-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.equipe-card-salva .equipe-info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.equipe-card-salva .equipe-info-item label {
+    font-size: 12px;
+    color: #666;
+}
+
+.equipe-card-salva .equipe-info-item strong {
+    color: #333;
+    font-size: 18px;
+}
+
+.equipe-membros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.membro-chip {
+    background: #e3f2fd;
+    border: 1px solid #0114dc;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #0114dc;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   17. MODAIS (JANELAS DE DIÁLOGO)
+   ========================================================================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   18. CHECKBOXES E BOTÕES ESPECÍFICOS
+   ========================================================================== */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   19. SUGESTÕES E BADGES GERAIS
+   ========================================================================== */
+.suggestion-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border-left: 4px solid #0114dc;
+}
+
+.suggestion-card.no-rest {
+    border-left-color: #ffc107;
+    background: #fff3cd;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+}
+
+.badge-warning {
+    background: #ffc107;
+    color: #333;
+}
+
+/* ==========================================================================
+   20. RODAPÉ (FOOTER)
+   ========================================================================== */
+footer {
+    padding: 10px 15px;
+    background: #2c3e50;
+    text-align: center;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    color: white;
+}
+
+footer img {
+    height: 20px;
+    margin-bottom: 5px;
+}
+
+footer p {
+    color: #ecf0f1;
+    font-size: 11px;
+    margin: 2px 0;
+}
+
+/* ========================================
+   21. LOADER / SPINNER DE CARREGAMENTO
+   ======================================== */
+.loader-overlay {
+    position: absolute; /* Relative to .content-wrapper */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #0114dc; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   22. RESPONSIVIDADE (MOBILE/TABLET)
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Container principal */
+    .container {
+        padding: 10px;
+    }
+
+    /* Header mobile */
+    header {
+        flex-direction: column;
+        padding: 12px;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .logo-container {
+        padding: 8px 12px;
+    }
+
+    .logo-container img {
+        height: 35px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    header p {
+        font-size: 12px;
+    }
+
+    /* Tabs mobile - scroll horizontal */
+    .tabs {
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+        gap: 5px;
+        padding: 8px 10px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-width: fit-content;
+    }
+
+    /* Cards mobile */
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .card h2 {
+        font-size: 1.2em;
+    }
+
+    /* Stats grid mobile - empilhados */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card .value {
+        font-size: 28px;
+    }
+
+    /* Formulários mobile */
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+        font-size: 16px; /* Previne zoom no iOS */
+        padding: 10px;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 15px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    /* Checkboxes mobile - maior área de toque */
+    .operacoes-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .operacao-item {
+        padding: 12px;
+    }
+
+    .operacao-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Tabelas mobile - scroll horizontal */
+    table {
+        font-size: 13px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table thead, table tbody {
+        display: table;
+        width: 100%;
+    }
+
+    table th, table td {
+        padding: 8px 6px;
+    }
+
+    /* Botões de ação menores */
+    table button {
+        padding: 6px 10px;
+        font-size: 12px;
+        width: auto;
+    }
+
+    /* Gantt mobile - scroll horizontal */
+    .gantt-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gantt-name-col {
+        min-width: 100px;
+        font-size: 10px;
+        padding: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gantt-day {
+        min-width: 30px;
+        font-size: 11px;
+    }
+
+    .gantt-bar {
+        font-size: 11px;
+        padding: 4px;
+    }
+
+    /* Legenda mobile - wrap */
+    .legend {
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .legend-item {
+        gap: 6px;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Modal mobile - tela cheia */
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 20px auto;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .close-modal {
+        font-size: 32px;
+        padding: 5px;
+    }
+
+    /* Alertas mobile */
+    .alert {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .alert-flutuante {
+        right: 10px;
+        top: 10px;
+        min-width: calc(100% - 20px);
+        max-width: calc(100% - 20px);
+        font-size: 13px;
+    }
+
+    /* Suggestion cards mobile */
+    .suggestion-card {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    /* Footer mobile */
+    footer {
+        padding: 12px 15px;
+        font-size: 11px;
+        margin-top: 20px;
+    }
+
+    footer img {
+        height: 20px;
+        margin-bottom: 5px;
+    }
+
+    footer p {
+        margin: 2px 0;
+    }
+
+    /* Touch targets adequados */
+    button, .tab, input[type="checkbox"] {
+        min-height: 44px;
+    }
+
+    .tab, button {
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ==========================================================================
+   23. CURSOR ARRASTÁVEL NO GANTT
+   ========================================================================== */
+.gantt-cursor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #ff4757; /* Vermelho vibrante */
+    z-index: 100;
+    cursor: ew-resize;
+}
+
+.gantt-cursor::before {
+    content: '▼';
+    position: absolute;
+    top: -10px;
+    left: -5.5px;
+    color: #ff4757;
+    font-size: 14px;
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    table {
+        font-size: 14px;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    header {
+        padding: 10px 15px;
+    }
+
+    .logo-container img {
+        height: 35px;
+    }
+
+    h1 {
+        font-size: 1.1em;
+    }
+}
+
+/* Animações para Alerta Crítico */
+@keyframes pulse-alert {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.15); 
+        opacity: 0.7; 
+    }
+}
+
+/* Badge crítico no menu */
+.badge-critico {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    animation: pulse-badge 2s infinite;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.5);
+}
+
+@keyframes pulse-badge {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.5);
+    }
+    50% { 
+        transform: scale(1.1); 
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.8);
+    }
+}

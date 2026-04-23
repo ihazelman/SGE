@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SLB One Subsea - Sistema de Gestão de Escalas</title>
+    <link rel="icon" type="image/svg+xml" href="https://www.onesubsea.slb.com/-/media/onesubseajv/images/logos/jv_mainlogo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="logo-container">
+                    <img src="https://www.onesubsea.slb.com/-/media/onesubseajv/images/logos/jv_mainlogo.svg" alt="SLB One Subsea" style="max-height: 60px;">
+                </div>
+                <div class="header-text">
+                    <h1>Sistema de Gestão de Escalas de Embarque</h1>
+                </div>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-name">{{ username }}</span>
+                    <i class="fa-solid fa-user-circle"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="#" onclick="customAlert('Funcionalidade de Perfil em desenvolvimento')"><i class="fa-solid fa-id-card"></i> Meu Perfil</a>
+                    <a href="#" onclick="customAlert('Funcionalidade de Alterar Senha em desenvolvimento')"><i class="fa-solid fa-key"></i> Alterar Senha</a>
+                    <a href="#" onclick="customAlert('Funcionalidade de Configurações em desenvolvimento')"><i class="fa-solid fa-gear"></i> Configurações</a>
+                    <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
+                    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="showTab('funcionarios')">👥 Funcionários</button>
+            <button class="tab" onclick="showTab('unidades')">🚢 Unidades</button>
+            <button class="tab" onclick="showTab('equipes')">👷 Montar Equipe</button>
+            <button class="tab" onclick="showTab('escalas')">📋 Escalas</button>
+            <button class="tab" onclick="showTab('ferias')">🏖️ Férias</button>
+            <button class="tab" onclick="showTab('gantt'); atualizarGantt()">📈 Visão Geral</button>
+            <button class="tab" onclick="showTab('operacoes'); carregarOperacoes()">⚙️ Operações</button>
+        </div>
+
+        <!-- Wrapper de conteúdo com scroll -->
+        <div class="content-wrapper">
+            <!-- Loader Overlay -->
+            <div id="loader-overlay" class="loader-overlay">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div style="display:flex;justify-content:space-between;align-items:start;">
+                        <h3>Total de Funcionários</h3>
+                        <i class="fa-solid fa-users" style="opacity:0.5;"></i>
+                    </div>
+                    <div class="value" id="total-funcionarios">0</div>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex;justify-content:space-between;align-items:start;">
+                        <h3>Embarques Ativos</h3>
+                        <i class="fa-solid fa-ship" style="opacity:0.5;"></i>
+                    </div>
+                    <div class="value" id="total-escalas">0</div>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex;justify-content:space-between;align-items:start;">
+                        <h3>Novas Escalas (30d)</h3>
+                        <i class="fa-solid fa-calendar-check" style="opacity:0.5;"></i>
+                    </div>
+                    <div class="value" id="escalas-proximas">0</div>
+                </div>
+            </div>
+
+            <!-- Alerta Crítico: 15+ Dias Embarcados -->
+            <div id="alerta-critico-15dias" class="card" style="display: none; background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%); color: white; border: none; box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4); margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 48px; animation: pulse-alert 2s infinite;">
+                        🚨
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 style="color: white; margin: 0 0 10px 0; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            ⚠️ ATENÇÃO CRÍTICA: Funcionários com 15+ Dias Embarcados
+                        </h2>
+                        <div id="lista-criticos-15dias" style="font-size: 16px; line-height: 1.8;">
+                            <!-- Preenchido via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerta de Funcionários acima de 14 dias -->
+            <div id="alerta-14-dias" style="display: none;">
+                <div class="card" style="background: #f3e8ff; border-left: 4px solid #9333ea;">
+                    <h2 style="color: #7e22ce; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 24px;">⚠️</span>
+                        Alerta: Funcionários com mais de 14 dias embarcados
+                    </h2>
+                    <div id="lista-alertas-14-dias" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <!-- Sondas e Pessoas Embarcadas -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>🛢️ Sondas e Pessoas Embarcadas</h2>
+                    <button onclick="showModalSonda()" style="padding: 8px 16px; flex-shrink: 0;">Nova Sonda</button>
+                </div>
+
+                <div id="sondas-container">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚠️ Alertas</h2>
+                <div id="alertas-container"></div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Funcionários por Operação</h2>
+                <div id="operacoes-chart"></div>
+            </div>
+        </div>
+
+        <!-- Funcionários -->
+        <div id="funcionarios" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>👥 Funcionários</h2>
+                    <button onclick="abrirModalNovoFuncionario()" style="background: #28a745; font-size: 14px; padding: 8px 16px; border-radius: 4px;">
+                        Novo Funcionário
+                    </button>
+                </div>
+                
+                <input type="text" id="filtro-tabela-funcionarios" placeholder="🔍 Buscar funcionário..." style="margin-bottom: 15px; width: 100%;">
+                <div style="overflow-x: auto;">
+                    <table id="tabela-funcionarios">
+                        <thead>
+                            <tr>
+                                <th>GIN</th>
+                                <th>Nome</th>
+                                <th>Grade</th>
+                                <th style="text-align:center;">Leader</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <!-- O ID AQUI É CRUCIAL PARA O JAVASCRIPT FUNCIONAR -->
+                        <tbody id="tabela-funcionarios-corpo">
+                            <!-- As linhas da tabela serão inseridas aqui pelo JavaScript -->
+                            <tr><td colspan="5" style="text-align:center;color:#999;padding:20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unidades Marítimas -->
+        <div id="unidades" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2>🚢 Unidades Marítimas</h2>
+                        <p style="color: #666; margin: 5px 0 0 0;">
+                            Gestão completa das unidades operacionais
+                        </p>
+                    </div>
+                    <button onclick="abrirModalNovaUnidade()" style="padding: 10px 20px;">➕ Nova Unidade</button>
+                </div>
+                
+                <div id="unidades-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <!-- Renderizado via unidades.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Nova/Editar Unidade -->
+        <div id="modal-unidade" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+
+                <h2 id="titulo-modal-unidade">➕ Nova Unidade Marítima</h2>
+
+                <form id="form-unidade" style="margin-top: 20px;">
+                    <input type="hidden" id="unidade-id">
+
+                    <div class="form-group">
+                        <label>Tipo de Operação *</label>
+                        <select id="unidade-tipo-operacao" required onchange="toggleCamposUnidade()">
+                            <option value="">Selecione...</option>
+                            <option value="ITH">ITH</option>
+                            <option value="LWO">LWO</option>
+                            <option value="IBAP">IBAP</option>
+                            <option value="IANM">IANM</option>
+                            <option value="BASE">BASE</option>
+                        </select>
+                    </div>
+
+                    <div id="group-operacao-normal">
+                        <div class="form-group">
+                            <label>Poço *</label>
+                            <input type="text" id="unidade-poco" required placeholder="Ex: Búzios 5">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sonda</label>
+                            <input type="text" id="unidade-sonda" placeholder="Ex: NS-29, Dalian">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contrato</label>
+                            <select id="unidade-contrato">
+                                <option value="">Selecione...</option>
+                                <option value="MERO 2">MERO 2</option>
+                                <option value="MERO 3">MERO 3</option>
+                                <option value="MERO 4">MERO 4</option>
+                                <option value="BUZIOS 6-9">BUZIOS 6-9</option>
+                                <option value="BUZIOS 10-11">BUZIOS 10-11</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>TAG</label>
+                            <input type="text" id="unidade-tag" placeholder="Ex: BZ-100">
+                        </div>
+                    </div>
+
+                    <div id="group-operacao-base" style="display: none;">
+                        <div class="form-group" id="group-unidade-base">
+                            <label>Qual a BASE? *</label>
+                            <select id="unidade-base-local">
+                                <option value="">Selecione...</option>
+                                <option value="MCE">MCE</option>
+                                <option value="RDO">RDO</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <input type="checkbox" id="unidade-servico-externo" onchange="toggleCamposUnidade()" style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="unidade-servico-externo" style="margin: 0; cursor: pointer;">Serviço Externo?</label>
+                        </div>
+                        <div class="form-group" id="group-local-externo" style="display: none;">
+                            <label>Descrever o local *</label>
+                            <input type="text" id="unidade-local-externo" placeholder="Ex: Oficina Terceira, Porto, etc.">
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div class="form-group">
+                            <label>📅 Data Início</label>
+                            <input type="date" id="unidade-inicio-op">
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Data Fim</label>
+                            <input type="date" id="unidade-final-op">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="unidade-observacoes" rows="3" placeholder="Descrição da operação..."></textarea>
+                    </div>
+
+                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                        <button type="button" onclick="fecharModalUnidade()" style="background:#6c757d;">Cancelar</button>
+                        <button type="submit" id="btn-salvar-unidade">💾 Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Montar Equipes -->
+        <div id="equipes" class="tab-content">
+            <div class="card">
+                <h2>👷 Montar Equipe de Trabalho</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Arraste e solte funcionários para montar sua equipe. Visualize no gráfico em tempo real.
+                </p>
+                
+                <div class="form-group">
+                    <label>Tipo de Atividade / Planejamento</label>
+                    <select id="equipe-atividade">
+                        <option value="embarque">🚢 Planejar Embarque</option>
+                        <option value="base">🏠 Planejar Período em Base</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidade Marítima</label>
+                    <select id="equipe-unidade">
+                        <option value="">Selecione...</option>
+                        <!-- Preenchido via JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <!-- Funcionários Disponíveis -->
+                <div class="card">
+                    <h3>📋 Funcionários Disponíveis</h3>
+                    <input type="text" id="filtro-funcionarios" placeholder="🔍 Buscar funcionário..." style="margin-bottom: 15px; width: 100%;">
+                    <div id="funcionarios-disponiveis" class="drag-zone" style="min-height: 400px; max-height: 500px; overflow-y: auto; border: 2px dashed #ddd; border-radius: 8px; padding: 15px; background: #f8f9fa;">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Equipe Montada -->
+                <div class="card">
+                    <h3>✅ Equipe Selecionada (<span id="contador-equipe">0</span>)</h3>
+                    <div id="equipe-montada" class="drag-zone equipe-zone" style="min-height: 400px; border: 2px dashed #0114dc; border-radius: 8px; padding: 15px; background: #e3f2fd;">
+                        <p style="text-align: center; color: #666; margin-top: 150px;" class="placeholder-text">
+                            Arraste funcionários aqui
+                        </p>
+                    </div>
+                    <button onclick="salvarEquipe()" style="width: 100%; margin-top: 15px;">💾 Salvar Equipe</button>
+                </div>
+            </div>
+
+            <!-- Gráfico da Equipe -->
+            <div class="card">
+                <h2>📊 Visualização da Equipe</h2>
+                <canvas id="grafico-equipe" style="max-height: 400px;"></canvas>
+            </div>
+
+            <!-- Equipes Salvas -->
+            <div class="card">
+                <h2>📂 Equipes Salvas</h2>
+                <div id="equipes-salvas">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Escalas -->
+        <div id="escalas" class="tab-content">
+            <div class="card">
+                <h2>📋 Cadastrar Período</h2>
+                <form id="form-escala">
+                    <div class="form-group">
+                        <label>Funcionário</label>
+                        <select id="escala-funcionario" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="escala-estado" required onchange="toggleOperacao()">
+                            <option value="">Selecione...</option>
+                            <option value="embarque">🚢 Embarque</option>
+                            <option value="folga">🏖️ Folga</option>
+                            <option value="base">🏠 Base</option>
+                            <option value="dobra">⚠️ Dobra</option>
+                            <option value="ferias">✈️ Férias</option>
+                        </select>
+                    </div>
+                    <div id="operacao-group" class="form-group" style="display: none;">
+                        <label>Operação / Unidade</label>
+                        <select id="escala-operacao">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Data Início</label>
+                            <input type="date" id="escala-inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim</label>
+                            <input type="date" id="escala-fim" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="escala-obs" rows="3" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                    <button type="submit">💾 Salvar Período</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📄 Escalas Cadastradas</h2>
+                <div style="overflow-x: auto;">
+                    <table id="tabela-escalas">
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>Estado</th>
+                                <th>Operação</th>
+                                <th>Data Início</th>
+                                <th>Data Fim</th>
+                                <th>Observações</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7" style="text-align:center;color:#999;padding:20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Férias -->
+        <div id="ferias" class="tab-content">
+            <div class="card">
+                <h2>Cadastrar Férias</h2>
+                <form id="form-ferias">
+                    <div class="form-group">
+                        <label>Funcionário</label>
+                        <select id="ferias-funcionario" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Início</label>
+                        <input type="date" id="ferias-inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim</label>
+                        <input type="date" id="ferias-fim" required>
+                    </div>
+                    <button type="submit">Cadastrar Férias</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Férias Cadastradas</h2>
+                <table id="tabela-ferias">
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Data Início</th>
+                            <th>Data Fim</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Gantt -->
+        <div id="gantt" class="tab-content">
+            <div class="card">
+                <h2>Visão Geral</h2>
+                <div class="form-group">
+                    <label>Período de Visualização</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" id="gantt-inicio">
+                        <input type="date" id="gantt-fim">
+                        <button onclick="atualizarGantt()">Atualizar</button>
+                    </div>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color embarque"></div>
+                        <span>🚢 Embarque</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color folga"></div>
+                        <span>🏖️ Folga</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color folga" style="background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2) 0, rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px);"></div>
+                        <span>🔒 Folga Inflexível</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color base"></div>
+                        <span>🏠 Base</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color dobra"></div>
+                        <span>⚠️ Dobra</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color ferias"></div>
+                        <span>✈️ Férias</span>
+                    </div>
+                </div>
+                
+                <div class="gantt-container">
+                    <div class="gantt-chart" id="gantt-chart"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Operações -->
+        <div id="operacoes" class="tab-content">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <div>
+                        <h2>⚙️ Histórico de Operações</h2>
+                        <p style="color:#666;margin-top:5px;font-size:13px;">Histórico de equipes e funcionários por poço</p>
+                    </div>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <select id="filtro-tipo-operacao" onchange="filtrarOperacoes()" style="width:200px;padding:8px;border:2px solid #ddd;border-radius:4px;font-size:13px;">
+                            <option value="">Todos os Tipos</option>
+                            <option value="ITH">ITH</option>
+                            <option value="LWO">LWO</option>
+                            <option value="IBAP">IBAP</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                        <button onclick="carregarOperacoes()" style="padding:8px 16px;">🔄 Atualizar</button>
+                    </div>
+                </div>
+                <div id="operacoes-container">
+                    <p style="text-align:center;color:#999;padding:40px;">Clique na aba para carregar as operações.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <img src="https://www.onesubsea.slb.com/-/media/onesubseajv/images/logos/jv_mainlogo.svg" alt="SLB One Subsea">
+            <p><strong>SLB One Subsea</strong> • Sistema de Gestão de Escalas © 2026</p>
+        </footer>
+
+        </div><!-- /content-wrapper -->
+    </div>
+
+    <!-- Modal de Sugestões -->
+    <div id="suggestion-modal" class="modal">
+        <div class="modal-content">
+            <h2>Sugerir Funcionários</h2>
+            <form id="form-suggestion">
+                <div class="form-group">
+                    <label>Operação</label>
+                    <select id="sug-operacao" required>
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Embarque</label>
+                    <input type="date" id="sug-inicio" required>
+                </div>
+                <div class="form-group">
+                    <label>Data Desembarque</label>
+                    <input type="date" id="sug-fim" required>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade de Pessoas</label>
+                    <input type="number" id="sug-quantidade" min="1" value="1" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit">Buscar Sugestões</button>
+                    <button type="button" class="secondary" onclick="closeSuggestionModal()">Cancelar</button>
+                </div>
+            </form>
+            <div id="suggestions-result"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Novo Funcionário -->
+    <div id="novo-funcionario-modal" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <h2>➕ Novo Funcionário</h2>
+            <form id="form-novo-funcionario">
+                <div class="form-group">
+                    <label>GIN (Matrícula)</label>
+                    <input type="text" id="novo-func-gin" required placeholder="Ex: 6123456">
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="novo-func-nome" required placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label>Grade</label>
+                    <input type="text" id="novo-func-grade" placeholder="Ex: G6">
+                </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="novo-func-leader" style="width:18px;height:18px;cursor:pointer;">
+                    <label for="novo-func-leader" style="margin:0;cursor:pointer;">Leader</label>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" style="background: #28a745;">Cadastrar</button>
+                    <button type="button" onclick="fecharModalNovoFuncionario()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Funcionário -->
+    <div id="editar-funcionario-modal" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <h2>✏️ Editar Funcionário</h2>
+            <form id="form-editar-funcionario">
+                <input type="hidden" id="edit-func-id">
+                <div class="form-group">
+                    <label>GIN (Matrícula)</label>
+                    <input type="text" id="edit-func-gin" required placeholder="Ex: 6123456">
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="edit-func-nome" required placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label>Grade</label>
+                    <input type="text" id="edit-func-grade" placeholder="Ex: G6">
+                </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="edit-func-leader" style="width:18px;height:18px;cursor:pointer;">
+                    <label for="edit-func-leader" style="margin:0;cursor:pointer;">Leader</label>
+                </div>
+                <div class="btn-group">
+                    <button type="submit">Salvar Alterações</button>
+                    <button type="button" onclick="closeEditarFuncionarioModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Equipe -->
+    <div id="editar-equipe-modal" class="modal">
+        <div class="modal-content">
+            
+            <h2>✏️ Editar Equipe</h2>
+            <form id="form-editar-equipe">
+                <input type="hidden" id="edit-equipe-id">
+                <div class="form-group">
+                    <label>Nome da Equipe</label>
+                    <input type="text" id="edit-equipe-nome" required placeholder="Ex: Equipe Marlim Sul - Turno A">
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidade Marítima</label>
+                    <select id="edit-equipe-unidade">
+                        <option value="">Selecione...</option>
+                        <!-- Preenchido via JavaScript -->
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                    <!-- Funcionários Disponíveis -->
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">📋 Disponíveis</h3>
+                        <input type="text" id="edit-filtro-funcionarios" placeholder="🔍 Buscar..." style="margin-bottom: 10px; width: 100%;">
+                        <div id="edit-funcionarios-disponiveis" class="drag-zone" style="min-height: 300px; border: 2px dashed #ddd; border-radius: 8px; padding: 10px; background: #f8f9fa; overflow-y: auto; max-height: 400px;">
+                            <!-- Preenchido via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Membros da Equipe -->
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">✅ Membros (<span id="edit-contador-equipe">0</span>)</h3>
+                        <div id="edit-equipe-membros" class="drag-zone equipe-zone" style="min-height: 300px; border: 2px dashed #0114dc; border-radius: 8px; padding: 10px; background: #e3f2fd; overflow-y: auto; max-height: 400px;">
+                            <p style="text-align: center; color: #666; margin-top: 120px;" class="placeholder-text">
+                                Arraste funcionários aqui
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit">Salvar Alterações</button>
+                    <button type="button" onclick="closeEditarEquipeModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro de Sonda -->
+    <div id="sonda-modal" class="modal">
+        <div class="modal-content">
+            
+            <h2>🛢️ Cadastrar Nova Sonda/Poço</h2>
+            <form id="form-sonda">
+                <div class="form-group">
+                    <label>Nome do Poço</label>
+                    <input type="text" id="sonda-poco" required placeholder="Ex: Poço A-123">
+                </div>
+                <div class="form-group">
+                    <label>Unidade Marítima</label>
+                    <select id="sonda-unidade" required>
+                        <!-- Preenchido dinamicamente -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Localização (Opcional)</label>
+                    <input type="text" id="sonda-localizacao" placeholder="Ex: Bacia de Campos, Lat/Long">
+                </div>
+                <div class="form-group">
+                    <label>Data de Início da Operação</label>
+                    <input type="date" id="sonda-inicio">
+                </div>
+                
+                <!-- Nova seção: Incluir Equipe -->
+                <div class="form-group" style="border-top: 2px solid #0114dc; padding-top: 15px; margin-top: 15px;">
+                    <label style="color: #0114dc; font-size: 14px;">👷 Incluir Equipe na Sonda</label>
+                    <p style="font-size: 11px; color: #666; margin-bottom: 10px;">
+                        Selecione uma equipe salva para incluir seus membros nesta sonda
+                    </p>
+                    <select id="sonda-equipe">
+                        <option value="">Nenhuma equipe (adicionar depois)</option>
+                        <!-- Preenchido dinamicamente com equipes salvas -->
+                    </select>
+                    <div id="preview-equipe" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; display: none;">
+                        <strong style="font-size: 12px;">Membros da equipe:</strong>
+                        <div id="membros-preview" style="margin-top: 5px;"></div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit">Cadastrar Sonda</button>
+                    <button type="button" onclick="closeModalSonda()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<!-- Modal: Editar Período -->
+<div id="modal-editar-periodo" class="modal">
+    <div class="modal-content">
+        
+        <h2>✏️ Editar Período</h2>
+        
+        <form id="form-editar-periodo" style="margin-top: 20px;">
+            <input type="hidden" id="editar-periodo-id">
+            
+            <div class="form-group">
+                <label>Funcionário</label>
+                <input type="text" id="editar-periodo-funcionario" disabled style="background: #f5f5f5; cursor: not-allowed;">
+                <small style="color: #666; font-size: 12px;">O funcionário não pode ser alterado. Para trocar, delete e crie novo período.</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Estado *</label>
+                <select id="editar-periodo-estado" required>
+                    <option value="embarque">Embarque</option>
+                    <option value="folga">Folga</option>
+                    <option value="base">Base</option>
+                    <option value="dobra">Dobra</option>
+                    <option value="ferias">Férias</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Operação/Unidade</label>
+                <select id="editar-periodo-operacao">
+                    <option value="">Nenhuma</option>
+                    <!-- Preenchido via JavaScript -->
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Data Início *</label>
+                    <input type="date" id="editar-periodo-inicio" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Data Fim *</label>
+                    <input type="date" id="editar-periodo-fim" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea id="editar-periodo-observacoes" rows="3" placeholder="Observações adicionais sobre este período..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" onclick="fecharModalEditarPeriodo()" style="background: #6c757d;">
+                    Cancelar
+                </button>
+                <button type="submit" style="background: #0114dc;">
+                    💾 Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Ações Rápidas (Dashboard) -->
+<div id="modal-acoes-embarcado" class="modal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 style="color: #0114dc;">Ações para <span id="acoes-func-nome"></span></h2>
+        <p style="margin: 10px 0;">Atualmente em: <strong id="acoes-func-unidade"></strong></p>
+        <p>Dias a bordo: <span id="acoes-func-dias" class="badge-dias"></span></p>
+        
+        <div class="form-group" style="margin-top: 15px; text-align: left;">
+            <label>📅 Data de Desembarque:</label>
+            <input type="date" id="acoes-func-data-desembarque" required>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            <button onclick="confirmarDesembarque()" style="background: #28a745; padding: 15px; font-size: 14px;">
+                🚢 Confirmar Desembarque
+            </button>
+            <p style="font-size: 10px; color: #666;">(Se > 14 dias, o sistema converterá o excesso em dobra automaticamente)</p>
+            
+            <button onclick="registrarDobraRapida()" style="background: #fd7e14; padding: 15px; font-size: 14px;">
+                ⚠️ Planejar Dobra
+            </button>
+            
+            <button onclick="fecharModalAcoes()" class="secondary" style="margin-top: 10px;">
+                Fechar
+            </button>
+        </div>
+    </div>
+</div>
+
+    </div><!-- /.container -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="application/json" id="unidades-iniciais-data">{{ unidades_iniciais | tojson }}</script>
+    <script>
+    var UNIDADES_INICIAIS = JSON.parse(document.getElementById('unidades-iniciais-data').textContent);
+    </script>
+    <script src="/static/app.js?v=18"></script>
+    <script src="/static/equipes.js?v=18"></script>
+    <script src="/static/unidades.js?v=18"></script>
+    <script>
+    // ==========================================
+    // OPERAÇÕES
+    // ==========================================
+    const TIPOS_OPERACAO = ['ITH','LWO','IBAP','Outros'];
+    let todasOperacoes = [];
+
+    async function carregarOperacoes() {
+        showLoader();
+        const container = document.getElementById('operacoes-container');
+        if (container) container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Carregando...</p>';
+        try {
+            const r = await fetch('/api/operacoes');
+            if (!r.ok) {
+                const errData = await r.json();
+                throw new Error(errData.error || 'Erro no servidor');
+            }
+            todasOperacoes = await r.json();
+            filtrarOperacoes();
+        } catch(e) {
+            console.error("Erro detalhado ao carregar operações:", e);
+            if (container) container.innerHTML = '<p style="text-align:center;color:#dc3545;padding:40px;">Erro ao carregar operações.</p>';
+        } finally {
+            hideLoader();
+        }
+    }
+
+    function filtrarOperacoes() {
+        const tipo = document.getElementById('filtro-tipo-operacao')?.value || '';
+        const filtradas = tipo ? todasOperacoes.filter(op => op.tipo_operacao === tipo) : todasOperacoes;
+        renderizarOperacoes(filtradas);
+    }
+
+    function renderizarOperacoes(ops) {
+        const container = document.getElementById('operacoes-container');
+        if (!container) return;
+
+        if (ops.length === 0) {
+            container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Nenhuma unidade marítima cadastrada.</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        ops.forEach(op => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:white;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #0114dc;';
+
+            const tipoOpts = TIPOS_OPERACAO
+                .map(t => `<option value="${t}" ${op.tipo_operacao === t ? 'selected' : ''}>${t}</option>`)
+                .join('');
+
+            const sondaNome = op.sonda ? op.sonda.nome_poco : '—';
+            const statusColor = op.status === 'ativo' ? '#28a745' : op.status === 'manutencao' ? '#fd7e14' : '#dc3545';
+            const statusLabel = op.status === 'ativo' ? 'Ativo' : op.status === 'manutencao' ? 'Manutenção' : 'Inativo';
+
+            // Equipes
+            const equipesHTML = op.equipes.length > 0
+                ? op.equipes.map(eq => `
+                    <span style="display:inline-block;background:#e3f2fd;border:1px solid #0114dc;padding:3px 10px;border-radius:12px;font-size:12px;color:#0114dc;margin:3px;">
+                        👷 ${eq.nome}
+                    </span>`).join('')
+                : '<span style="color:#bbb;font-size:13px;">Nenhuma equipe registrada</span>';
+
+            // Histórico de funcionários
+            const historicoRows = op.historico_escalas.map(h => {
+                const estadoCor  = (typeof ESTADOS_CORES  !== 'undefined' ? ESTADOS_CORES[h.estado]  : null) || '#999';
+                const estadoLabel = (typeof ESTADOS_LABELS !== 'undefined' ? ESTADOS_LABELS[h.estado] : null) || h.estado;
+                const di = h.data_embarque   ? new Date(h.data_embarque   + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+                const df = h.data_desembarque ? new Date(h.data_desembarque + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+                return `<tr>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;">${h.gin}</td>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;">${h.nome}</td>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;">${h.grade || '—'}</td>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;">${di}</td>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;">${df}</td>
+                    <td style="padding:7px 10px;border-bottom:1px solid #eee;">
+                        <span style="background:${estadoCor};color:white;padding:2px 8px;border-radius:10px;font-size:11px;">${estadoLabel}</span>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            const historicoHTML = op.historico_escalas.length > 0
+                ? `<table style="width:100%;border-collapse:collapse;margin-top:10px;">
+                    <thead>
+                        <tr style="background:#0114dc;color:white;">
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">GIN</th>
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">Nome</th>
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">Grade</th>
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">Embarque</th>
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">Desembarque</th>
+                            <th style="padding:8px 10px;text-align:left;font-size:12px;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>${historicoRows}</tbody>
+                </table>`
+                : '<p style="color:#bbb;font-size:13px;margin-top:8px;">Nenhum funcionário registrado nesta operação.</p>';
+
+            card.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;padding-bottom:15px;border-bottom:2px solid #f0f0f0;">
+                    <div style="flex:1;">
+                        <h3 style="margin:0 0 10px 0;color:#0114dc;font-size:20px;">📍 ${op.poco}</h3>
+                        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <label style="font-size:12px;color:#666;margin:0;white-space:nowrap;">Tipo de Operação:</label>
+                                <select onchange="atualizarTipoOperacao(${op.id}, this.value)"
+                                        style="padding:4px 8px;font-size:12px;border:1px solid #ddd;border-radius:4px;width:auto;min-width:160px;">
+                                    <option value="">Selecione...</option>
+                                    ${tipoOpts}
+                                </select>
+                            </div>
+                            <div>
+                                <span style="font-size:12px;color:#666;">🛢️ Sonda: </span>
+                                <strong style="font-size:13px;">${sondaNome}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:12px;color:#666;">🏢 Operador: </span>
+                                <strong style="font-size:13px;">${op.operador || '—'}</strong>
+                            </div>
+                            <span style="color:${statusColor};font-weight:600;font-size:12px;">● ${statusLabel}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;margin-left:20px;">
+                        <div style="font-size:32px;font-weight:bold;color:#0114dc;">${op.total_ocorrencias}</div>
+                        <div style="font-size:11px;color:#666;">registros</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <strong style="font-size:13px;color:#333;">👷 Equipes que atuaram:</strong>
+                    <div style="margin-top:8px;">${equipesHTML}</div>
+                </div>
+
+                <details>
+                    <summary style="cursor:pointer;font-size:13px;font-weight:600;color:#0114dc;padding:8px 0;user-select:none;">
+                        📋 Histórico de Funcionários (${op.historico_escalas.length} registros)
+                    </summary>
+                    <div style="margin-top:10px;overflow-x:auto;">${historicoHTML}</div>
+                </details>
+            `;
+
+            container.appendChild(card);
+        });
+    }
+
+    async function atualizarTipoOperacao(unidadeId, tipo) {
+        try {
+            await fetch(`/api/unidades-completas/${unidadeId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({tipo_operacao: tipo})
+            });
+            const op = todasOperacoes.find(o => o.id === unidadeId);
+            if (op) op.tipo_operacao = tipo;
+        } catch(e) {
+            console.error('Erro ao atualizar tipo de operação:', e);
+        }
+    }
+
+    // A função `abrirModalEditarPeriodo` e `fecharModalEditarPeriodo` já existem no arquivo `app.js`
+    // Esta implementação garante que o clique na barra funcione.
+    </script>
+</body>
+</html>
